@@ -1,0 +1,120 @@
+@model IEnumerable<ShopLite.Models.Product>
+
+@{
+    ViewBag.Title = "Danh mục sản phẩm";
+    var categories = ViewBag.Categories as IEnumerable<ShopLite.Models.Category>;
+    int? selectedCategoryId = ViewBag.CategoryId as int?;
+    var selectedCategory = categories == null || !selectedCategoryId.HasValue
+        ? null
+        : categories.FirstOrDefault(c => c.CategoryId == selectedCategoryId.Value);
+}
+
+@functions {
+    public string ResolveImageUrl(string imagePath)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath))
+        {
+            return Url.Content("~/Content/images/placeholder.png");
+        }
+
+        imagePath = imagePath.Trim().Replace("\\", "/");
+
+        if (imagePath.StartsWith("http://", System.StringComparison.OrdinalIgnoreCase)
+            || imagePath.StartsWith("https://", System.StringComparison.OrdinalIgnoreCase)
+            || imagePath.StartsWith("data:", System.StringComparison.OrdinalIgnoreCase))
+        {
+            return imagePath;
+        }
+
+        imagePath = imagePath.TrimStart('~', '/');
+
+        if (imagePath.StartsWith("Content/", System.StringComparison.OrdinalIgnoreCase))
+        {
+            return Url.Content("~/" + imagePath);
+        }
+
+        if (imagePath.StartsWith("images/", System.StringComparison.OrdinalIgnoreCase))
+        {
+            imagePath = imagePath.Substring("images/".Length);
+        }
+
+        return Url.Content("~/Content/images/" + imagePath);
+    }
+}
+
+<div class="container catalog-page">
+    <div class="catalog-heading">
+        <span class="section-heading__eyebrow">SHOPLITE</span>
+        <h1>@(selectedCategory == null ? "Danh mục sản phẩm" : selectedCategory.CategoryName)</h1>
+        <p>Chọn danh mục bạn quan tâm để xem các sản phẩm phù hợp.</p>
+    </div>
+
+    <div class="row g-4">
+        <aside class="col-lg-3">
+            <section class="catalog-sidebar">
+                <h2>Danh mục</h2>
+                <a class="catalog-category @(selectedCategoryId == null ? "active" : "")"
+                   href="@Url.Action("Catalog", "Home", new { keyword = ViewBag.Keyword })">
+                    Tất cả sản phẩm
+                </a>
+                @if (categories != null)
+                {
+                    foreach (var category in categories)
+                    {
+                        <a class="catalog-category @(selectedCategoryId == category.CategoryId ? "active" : "")"
+                           href="@Url.Action("Catalog", "Home", new { categoryId = category.CategoryId, keyword = ViewBag.Keyword })">
+                            @category.CategoryName
+                        </a>
+                    }
+                }
+            </section>
+        </aside>
+
+        <section class="col-lg-9" id="products">
+            <div class="catalog-results-heading">
+                <h2>@(selectedCategory == null ? "Tất cả sản phẩm" : selectedCategory.CategoryName)</h2>
+                <span>@Model.Count() sản phẩm</span>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="empty-state">
+                    <h3>Chưa tìm thấy sản phẩm</h3>
+                    <p>Thử từ khóa khác hoặc chọn một danh mục khác nhé.</p>
+                    <a class="btn btn-outline-primary" href="@Url.Action("Catalog", "Home")">Xem tất cả sản phẩm</a>
+                </div>
+            }
+            else
+            {
+                <div class="row g-3">
+                    @foreach (var product in Model)
+                    {
+                        <div class="col-6 col-md-4 col-xl-3">
+                            <article class="product-card">
+                                <a class="product-card__image-link" href="#" aria-label="@product.ProductName">
+                                    @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                                    {
+                                        <img src="@ResolveImageUrl(product.ImageUrl)" alt="@product.ProductName" class="product-card__image" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <div class="product-card__placeholder">SHOPLITE</div>
+                                    }
+                                </a>
+                                @if (product.Category != null)
+                                {
+                                    <span class="product-card__category">@product.Category.CategoryName</span>
+                                }
+                                <h3 class="product-card__name">@product.ProductName</h3>
+                                <div class="product-card__bottom">
+                                    <span class="product-card__price">@product.Price.ToString("N0") đ</span>
+                                    <a href="#" class="product-card__add" aria-label="Thêm @product.ProductName vào giỏ hàng">+</a>
+                                </div>
+                            </article>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+</div>

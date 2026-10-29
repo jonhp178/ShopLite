@@ -1,0 +1,32 @@
+<header class="shop-header">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg shop-navbar">
+            <a class="navbar-brand shop-logo" href="@Url.Action("Index", "Home")">ShopLite</a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#shopNavigation"
+                    aria-controls="shopNavigation" aria-expanded="false" aria-label="Mở menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="shopNavigation">
+                @using (Html.BeginForm("Catalog", "Home", FormMethod.Get, new { @class = "shop-search", role = "search" }))
+                {
+                    <input class="form-control" type="search" name="keyword" value="@ViewBag.Keyword" placeholder="Tìm kiếm sản phẩm..." aria-label="Tìm kiếm sản phẩm" />
+                    <button type="submit" class="shop-search__button" aria-label="Tìm kiếm">Tìm</button>
+                }
+
+            <ul class="navbar-nav shop-menu">
+                <li class="nav-item">@Html.ActionLink("Trang chủ", "Index", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "Home")#products">Sản phẩm</a></li>
+                <li class="nav-item">@Html.ActionLink("Danh mục", "Index", "Product", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Liên hệ", "Contact", "Home", null, new { @class = "nav-link" })</li>
+            </ul>
+
+                <div class="shop-actions">
+                    <a href="#" class="shop-login"><span>Đăng nhập / Đăng ký</span></a>
+                    <a href="#" class="shop-cart" aria-label="Giỏ hàng">Giỏ hàng<span class="shop-cart__count">0</span></a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
